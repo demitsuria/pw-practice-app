@@ -118,4 +118,17 @@ test('assertions', async ({ page }) => {
     const value = 5
     expect(value).toEqual(5)
 
+    const text = await basicFormButton.textContent()
+    expect(text).toEqual('Submit')
+
+    //Locator assertion
+
+    await expect(basicFormButton).toHaveText('Submit')
+
+    //Soft assertion
+
+    await expect.soft(basicFormButton).toHaveText('Submit5')
+    await basicFormButton.click()
+
+    
 })

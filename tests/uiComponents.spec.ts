@@ -51,3 +51,86 @@ test.describe('Form Layouts page', () => {
     })
 })
 
+test('checkboxes', async ({ page }) => {
+    await page.getByText('Modal & Overlays').click()
+    await page.getByText('Toastr').click()
+
+    await page.getByRole('checkbox', { name: 'Hide on click' }).uncheck({ force: true })
+    await page.getByRole('checkbox', { name: 'Prevent arising of duplicate toast' }).check({ force: true })
+
+    const allBoxes = page.getByRole('checkbox')
+
+    for (const box of await allBoxes.all()) {
+        await box.uncheck({ force: true })
+        expect(await box.isChecked).toBeFalsy()
+    }
+
+})
+
+test('Lists and dropdowns', async ({ page }) => {
+
+    const dropdownMenu = page.locator('ngx-header').locator('nb-select')
+    await dropdownMenu.click()
+
+    page.getByRole('list') // list has UL tag
+    page.getByRole('listitem') //list has LI tag
+
+    //const optionList = page.getByRole('list').locator('nb-option')
+
+    const optionList = page.locator('nb-option-list').locator('nb-option')
+
+    await expect(optionList).toHaveText(['Light', 'Dark', 'Cosmic', 'Corporate'])
+
+    await optionList.filter({ hasText: 'Cosmic' }).click()
+
+    const header = page.locator('nb-layout-header')
+    await expect(header).toHaveCSS('background-color', 'rgb(50, 50, 89)') //color validation
+
+    const colors = {
+        "Light": "rgb(255, 255, 255)",
+        "Dark": "rgb(34, 43, 69)",
+        "Cosmic": "rgb(50, 50, 89)",
+        "Corporate": "rgb(255, 255, 255)",
+    }
+
+
+    for (const color in colors) {
+        await dropdownMenu.click()
+        await optionList.filter({ hasText: color }).click()
+        await expect(header).toHaveCSS('background-color', colors[color])
+    }
+})
+
+
+test('tooltips', async ({ page }) => {
+    await page.getByText('Modal & Overlays').click()
+    await page.getByText('Tooltip').click()
+
+    const tooltipCard = page.locator('nb-card', { hasText: "Tooltip Placements" })
+    await tooltipCard.getByRole('button', { name: "Top" }).hover()
+
+    //page.getByRole('tooltip') //if you have a role tooltip created
+
+    const tooltip = await page.locator('nb-tooltip').textContent()
+    expect(tooltip).toEqual('This is a tooltip')
+
+})
+
+test('Dialog Box', async ({ page }) => {
+    await page.getByText('Tables & Data').click()
+    await page.getByText('Smart Table').click()
+
+    page.on('dialog', dialog => { //listener
+        expect(dialog.message()).toEqual('Are you sure you want to delete?')
+        dialog.accept()
+
+    })
+
+    await page.getByRole('table').locator('tr', { hasText: 'mdo@gmail.com' }).locator('.nb-trash').click()
+
+    await expect(page.locator('table tr').first()).not.toHaveText('mdo@gmail.com')
+
+
+
+})
+

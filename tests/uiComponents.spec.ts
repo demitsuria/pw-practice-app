@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-
     await page.goto('http://localhost:4200/')
-
 })
 
 test.describe('Form Layouts page', () => {
@@ -42,7 +40,6 @@ test.describe('Form Layouts page', () => {
 
         //Locator assertion
         await expect(usingTheGridForm.getByRole('radio', { name: 'Option 1' })).toBeChecked()
-
         await usingTheGridForm.getByLabel('Option 2').check({ force: true })
 
         expect(await usingTheGridForm.getByLabel('Option 1').isChecked()).toBeFalsy()
